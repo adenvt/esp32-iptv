@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef Audio_h
 #define Audio_h
 

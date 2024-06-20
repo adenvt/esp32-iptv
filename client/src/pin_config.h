@@ -53,7 +53,7 @@
 
 #define LIVESTREAM
 #ifdef LIVESTREAM
-#define SERVER_URL            "http://192.168.8.100:8080/stream"
+#define SERVER_URL            "http://192.168.8.100:3000/api/stream/0"
 #define VIDEO_FRAMERATE       12
 #else
 #define SERVER_URL            "http://192.168.8.100:5173/1-minutes.avi"

@@ -19,6 +19,10 @@ Player player;
 
 void setup()
 {
+  log_d("[MAIN] Running on core: %d", xPortGetCoreID());
+  log_d("[MAIN] psram size: %d kb", ESP.getPsramSize() / 1024);
+  log_d("[MAIN] FLASH size: %d kb", ESP.getFlashChipSize() / 1024);
+
   wifiMulti.addAP(WIFI_SSID, WIFI_PASSWORD);
 }
 
@@ -56,12 +60,12 @@ void loop()
           player.loop();
         }
 
-        log_d("[HTTP] connection closed or file end.\n");
+        log_d("[HTTP] connection closed or file end");
       }
     }
     else
     {
-      log_d("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+      log_d("[HTTP] GET... failed, error: %s", http.errorToString(httpCode).c_str());
     }
 
     http.end();

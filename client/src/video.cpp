@@ -66,14 +66,10 @@ void Video::begin()
   pinMode(PIN_POWER_ON, OUTPUT);
   digitalWrite(PIN_POWER_ON, HIGH);
 
-  pinMode(PIN_LCD_BL, OUTPUT);
-  digitalWrite(PIN_LCD_BL, HIGH);
-
   this->queue->clear();
 
   this->tft->begin();
   this->tft->setRotation(3);
-  this->tft->invertDisplay(1);
   this->tft->fillScreen(TFT_BLACK);
 }
 

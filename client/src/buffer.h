@@ -1,3 +1,4 @@
+#pragma once
 
 #ifndef MutableBuffer_h
 #define MutableBuffer_h

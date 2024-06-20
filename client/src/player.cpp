@@ -26,7 +26,7 @@ void Player::onDecoderChunk(void *p, const char *type, const size_t size, const 
 {
   Player *self = (Player *)p;
 
-  log_d("[PLAYER] Got chunk: '%c%c%c%c' (%d)\n", type[0], type[1], type[2], type[3], size);
+  // log_d("[PLAYER] Got chunk: '%c%c%c%c' (%d)\n", type[0], type[1], type[2], type[3], size);
 
   if (strncmp(type + 2, TAG_AUDIO, 2) == 0)
   {

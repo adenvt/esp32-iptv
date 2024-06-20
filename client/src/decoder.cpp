@@ -59,7 +59,7 @@ void Decoder::findMovi()
     {
       this->remainingMovi = readUint32LE(dSize);
 
-      log_d("[DECODER] Found movi: %d\n", this->remainingMovi);
+      log_d("[DECODER] Found movi: %d", this->remainingMovi);
 
       if (this->onChunkStart)
         this->onChunkStart();

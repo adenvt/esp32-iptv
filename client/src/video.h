@@ -1,10 +1,14 @@
+#pragma once
+
 #ifndef Video_h
 #define Video_h
 
+// #define USER_SETUP_LOADED
+
 #include <Arduino.h>
 #include "JPEGDEC.h"
-#include "queue.h"
 #include "TFT_eSPI.h"
+#include "queue.h"
 #include "pin_config.h"
 
 class Video
