@@ -29,8 +29,7 @@ export interface BroadcastChannelMeta {
   options: string[],
 }
 
-const AVI_VIDEO_TAG = 'dc'
-const AVI_HEADER    = Buffer.from([
+const AVI_HEADER = Buffer.from([
   /* eslint-disable array-element-newline */
   0x4C, 0x49, 0x53, 0x54, // 'LIST'
   0xFF, 0xFF, 0xFF, 0xFF, // [size]
@@ -56,7 +55,7 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
 
               return chunk.subarray(i, i + 4)
                 .toString()
-                .endsWith(AVI_VIDEO_TAG)
+                .endsWith('dc')
             })
 
             if (i > -1) {
@@ -77,6 +76,8 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
       .withOption([
         // eslint-disable-next-line array-element-newline
         '-preset', 'veryfast',
+        // eslint-disable-next-line array-element-newline
+        '-sws_flags', 'lanczos',
         ...server.options,
       ])
       .withVideoCodec('mjpeg')
@@ -119,6 +120,7 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
     setResponseHeader(event, 'Content-Type', 'video/x-msvideo')
     setResponseHeader(event, 'Cache-Control', 'no-cache')
     setResponseHeader(event, 'Transfer-Encoding', 'chunked')
+    setResponseHeader(event, 'Keep-Alive', 'timeout=5, max=1')
 
     if (!servers[channelNum]) {
       setResponseStatus(event, 404)

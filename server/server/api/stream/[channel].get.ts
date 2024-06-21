@@ -1,18 +1,10 @@
 import { sendBroadcast } from '../../utils/broadcast'
+import { z } from 'zod'
+
+const paramsSchema = z.object({ channel: z.coerce.number() })
 
 export default defineEventHandler(async (event) => {
-  appendCorsHeaders(event, { origin: '*' })
+  const params = await getValidatedRouterParams(event, paramsSchema.parse)
 
-  const channel = Number.parseInt(getRouterParam(event, 'channel') as string)
-
-  if (!Number.isFinite(channel)) {
-    setResponseStatus(event, 404)
-
-    return {
-      code   : 404,
-      message: 'Not Found',
-    }
-  }
-
-  return await sendBroadcast(event, channel)
+  return await sendBroadcast(event, params.channel)
 })
