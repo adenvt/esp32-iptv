@@ -1,8 +1,11 @@
-import { execSync } from 'node:child_process'
+import { spawn } from 'node:child_process'
 
-export function getVideoUrl (url: string) {
-  const stdout = execSync(`youtube-dl -f "worst[height>=170]" -g "${url}"`)
-  const result = stdout.toString().trim()
-
-  return result
+export function getStream (url: string) {
+  return spawn('yt-dlp', [
+    '-f',
+    'worst[height>=170]',
+    url,
+    '-o',
+    '-',
+  ])
 }

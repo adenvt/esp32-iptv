@@ -1,5 +1,5 @@
 {
-  "name": "iptv-server",
+  "name": "esp32-iptv-server",
   "packageManager": "yarn@4.3.0",
   "private": true,
   "type": "module",

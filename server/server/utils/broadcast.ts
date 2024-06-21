@@ -2,6 +2,8 @@ import FFmpeg from 'fluent-ffmpeg'
 import type { H3Event } from 'h3'
 import { sendStream, setResponseHeader } from 'h3'
 import { Writable } from 'node:stream'
+import type { ChildProcessWithoutNullStreams } from 'node:child_process'
+import { getStream } from './youtube'
 
 export interface BroadcastClient {
   isStart: boolean,
@@ -9,7 +11,8 @@ export interface BroadcastClient {
 }
 
 export interface BroadcastChannel {
-  input: FFmpeg.FfmpegCommand,
+  source: ChildProcessWithoutNullStreams | string,
+  decoder: FFmpeg.FfmpegCommand,
   sender: Writable,
   clients: Map<H3Event, BroadcastClient>,
 }
@@ -71,13 +74,13 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
       },
     })
 
-    const url   = server.url.includes('youtube') ? getVideoUrl(server.url) : server.url
-    const input = FFmpeg(url)
+    const source  = server.url.includes('youtube') ? getStream(server.url) : server.url
+    const decoder = FFmpeg(typeof source === 'string' ? source : source.stdout)
       .withOption([
-        // eslint-disable-next-line array-element-newline
-        '-preset', 'veryfast',
-        // eslint-disable-next-line array-element-newline
-        '-sws_flags', 'lanczos',
+        '-preset',
+        'veryfast',
+        '-sws_flags',
+        'lanczos',
         ...server.options,
       ])
       .withVideoCodec('mjpeg')
@@ -92,13 +95,14 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
         console.error(error)
       })
 
-    input
+    decoder
       .pipe(sender)
 
     const channel: BroadcastChannel = {
+      source,
       clients,
       sender,
-      input,
+      decoder,
     }
 
     channels.set(channelNum, channel)
@@ -110,7 +114,10 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
     const channel = channels.get(channelNum)
 
     if (channel) {
-      channel.input.kill('SIGKILL')
+      channel.decoder.kill('SIGKILL')
+
+      if (typeof channel.source !== 'string')
+        channel.source.kill('SIGKILL')
 
       channels.delete(channelNum)
     }
