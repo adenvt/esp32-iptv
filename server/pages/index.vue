@@ -34,8 +34,8 @@
 </template>
 
 <script lang="ts" setup>
-import { Streamer } from '~/utils/streamer'
-import { AviPlayer } from '~/utils/player'
+import type { Streamer } from '~/utils/streamer'
+import type { AviPlayer } from '~/utils/player'
 
 const isStarted = ref(false)
 const player    = shallowRef<AviPlayer>()
@@ -44,7 +44,10 @@ const streamer  = shallowRef<Streamer>()
 const channel  = ref(0)
 const channels = ref<Array<{ name: string }>>([])
 
-function init () {
+async function init () {
+  const { Streamer }  = await import('~/utils/streamer')
+  const { AviPlayer } = await import('~/utils/player')
+
   player.value   = new AviPlayer()
   streamer.value = new Streamer(`/api/stream/${channel.value}`, {
     onConnected () {
