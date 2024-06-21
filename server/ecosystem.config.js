@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   apps: [
     {
       name  : 'esp32-iptv-server',
