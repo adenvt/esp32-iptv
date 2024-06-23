@@ -1,13 +1,14 @@
-import FFmpeg from 'fluent-ffmpeg'
+/* eslint-disable @typescript-eslint/promise-function-async */
 import type { H3Event } from 'h3'
-import { sendStream, setResponseHeader } from 'h3'
-import { Writable } from 'node:stream'
 import type { ChildProcessWithoutNullStreams } from 'node:child_process'
+import { setResponseHeader, createError } from 'h3'
+import FFmpeg from 'fluent-ffmpeg'
+import { Writable } from 'node:stream'
 import { getStream } from './youtube'
 
 export interface BroadcastClient {
   isStart: boolean,
-  controller: ReadableStreamDefaultController<Buffer>,
+  response: H3Event['node']['res'],
 }
 
 export interface BroadcastChannel {
@@ -40,6 +41,11 @@ const AVI_HEADER = Buffer.from([
   /* eslint-enable array-element-newline */
 ])
 
+function isFFMpegCancel (error: unknown): error is Error {
+  return error instanceof Error
+    && error.message === 'ffmpeg was killed with signal SIGKILL'
+}
+
 export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: number, sampleRate: number) {
   const channels = new Map<number, BroadcastChannel>()
 
@@ -50,7 +56,7 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
       write (chunk: Buffer, encoding, next) {
         for (const client of clients.values()) {
           if (client.isStart || clients.size === 1)
-            client.controller.enqueue(chunk)
+            client.response.write(chunk)
           else {
             const i = chunk.findIndex((c, i) => {
               if (i > chunk.length - 5)
@@ -62,8 +68,8 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
             })
 
             if (i > -1) {
-              client.controller.enqueue(AVI_HEADER)
-              client.controller.enqueue(chunk.subarray(i))
+              client.response.write(AVI_HEADER)
+              client.response.write(chunk.subarray(i))
 
               client.isStart = true
             }
@@ -91,9 +97,6 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
       .withAudioFrequency(sampleRate)
       .withAudioChannels(1)
       .withOutputFormat('avi')
-      .on('error', (error) => {
-        console.error(error)
-      })
 
     decoder
       .pipe(sender)
@@ -119,48 +122,54 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
       if (typeof channel.source !== 'string')
         channel.source.kill('SIGKILL')
 
+      channel.sender.end()
+
       channels.delete(channelNum)
     }
   }
 
-  async function sendBroadcast (event: H3Event, channelNum = 0) {
+  function validateBroadcast (event: H3Event, channelNum = 0) {
+    if (!servers[channelNum]) {
+      throw createError({
+        statusCode   : 404,
+        statusMessage: 'Not Found',
+      })
+    }
+  }
+
+  function sendBroadcast (event: H3Event, channelNum = 0) {
+    validateBroadcast(event, channelNum)
+
     setResponseHeader(event, 'Content-Type', 'application/octet-stream')
     setResponseHeader(event, 'Cache-Control', 'no-cache')
     setResponseHeader(event, 'Transfer-Encoding', 'chunked')
 
-    if (!servers[channelNum]) {
-      setResponseStatus(event, 404)
+    return new Promise<void>((resolve, reject) => {
+      const channel = channels.get(channelNum) ?? startChannel(channelNum)
 
-      return {
-        code   : 404,
-        message: 'Not Found',
-      }
-    }
+      channel.clients.set(event, { isStart: false, response: event.node.res })
 
-    const stream = new ReadableStream<Buffer>({
-      start (controller) {
-        const channel = channels.get(channelNum) ?? startChannel(channelNum)
+      channel.decoder.once('error', (error: Error) => {
+        if (!isFFMpegCancel(event))
+          console.error(error)
 
-        channel.clients.set(event, { isStart: false, controller })
-      },
-      cancel () {
-        const channel = channels.get(channelNum)
+        reject(error)
+      })
 
-        if (channel) {
-          channel.clients.delete(event)
+      event.node.res.once('close', () => {
+        channel.clients.delete(event)
 
-          if (channel.clients.size === 0)
-            stopChannel(channelNum)
-        }
-      },
+        if (channel.clients.size === 0)
+          stopChannel(channelNum)
+
+        resolve()
+      })
     })
-
-    return await sendStream(event, stream)
   }
 
   return { sendBroadcast }
 }
 
-export async function sendBroadcast (event: H3Event, channelNum = 0) {
-  return await event.context.$broadcaster.sendBroadcast(event, channelNum)
+export function sendBroadcast (event: H3Event, channelNum = 0) {
+  return event.context.$broadcaster.sendBroadcast(event, channelNum)
 }

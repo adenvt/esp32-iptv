@@ -3824,6 +3824,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chalk@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "chalk@npm:3.0.0"
+  dependencies:
+    ansi-styles: "npm:^4.1.0"
+    supports-color: "npm:^7.1.0"
+  checksum: 10c0/ee650b0a065b3d7a6fda258e75d3a86fc8e4effa55871da730a9e42ccb035bf5fd203525e5a1ef45ec2582ecc4f65b47eb11357c526b84dd29a14fb162c414d2
+  languageName: node
+  linkType: hard
+
 "chalk@npm:^4.0.0, chalk@npm:^4.1.0, chalk@npm:^4.1.1, chalk@npm:^4.1.2":
   version: 4.1.2
   resolution: "chalk@npm:4.1.2"
@@ -5519,10 +5529,10 @@ __metadata:
     eslint-plugin-vue: "npm:9.23.0"
     fluent-ffmpeg: "npm:^2.1.3"
     nuxt: "npm:^3.12.2"
+    pino-colada: "npm:^2.2.2"
     typescript: "npm:5.4.5"
     vue: "npm:^3.4.29"
     vue-router: "npm:^4.3.3"
-    zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
 
@@ -5697,6 +5707,13 @@ __metadata:
     merge2: "npm:^1.3.0"
     micromatch: "npm:^4.0.4"
   checksum: 10c0/42baad7b9cd40b63e42039132bde27ca2cb3a4950d0a0f9abe4639ea1aa9d3e3b40f98b1fe31cbc0cc17b664c9ea7447d911a152fa34ec5b72977b125a6fc845
+  languageName: node
+  linkType: hard
+
+"fast-json-parse@npm:^1.0.2":
+  version: 1.0.3
+  resolution: "fast-json-parse@npm:1.0.3"
+  checksum: 10c0/2c58c7a0f7f1725c9da1272839f9bee3ccc13b77672b18ab4ac470c707999bca39828cd7e79b87c73017f21c3ddff37992d03fa2fd2da124d9bd06c1d02c9b7e
   languageName: node
   linkType: hard
 
@@ -8739,6 +8756,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"parse-ms@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "parse-ms@npm:2.1.0"
+  checksum: 10c0/9c5c0a95c6267c84085685556a6e102ee806c3147ec11cbb9b98e35998eb4a48a757bd6ea7bfd930062de65909a33d24985055b4394e70aa0b65ee40cef16911
+  languageName: node
+  linkType: hard
+
 "parse-path@npm:^7.0.0":
   version: 7.0.0
   resolution: "parse-path@npm:7.0.0"
@@ -8879,6 +8903,21 @@ __metadata:
     readable-stream: "npm:^4.0.0"
     split2: "npm:^4.0.0"
   checksum: 10c0/b4ab59529b7a91f488440147fc58ee0827a6c1c5ca3627292339354b1381072c1a6bfa9b46d03ad27872589e8477ecf74da12cf286e1e6b665ac64a3b806bf07
+  languageName: node
+  linkType: hard
+
+"pino-colada@npm:^2.2.2":
+  version: 2.2.2
+  resolution: "pino-colada@npm:2.2.2"
+  dependencies:
+    chalk: "npm:^3.0.0"
+    fast-json-parse: "npm:^1.0.2"
+    prettier-bytes: "npm:^1.0.3"
+    pretty-ms: "npm:^5.0.0"
+    split2: "npm:^3.0.0"
+  bin:
+    pino-colada: bin.js
+  checksum: 10c0/6afa6cc7fc92e2bdc3bfa3612b0ce44e6fbee931f40103925611a3264ca2bf68f9bb018203e2ff97aa358077e20044ee4101f5c8cdb772a650ac8dd20aa5012f
   languageName: node
   linkType: hard
 
@@ -9389,10 +9428,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"prettier-bytes@npm:^1.0.3":
+  version: 1.0.4
+  resolution: "prettier-bytes@npm:1.0.4"
+  checksum: 10c0/d9e7cd144a7caaec5dc8c96f6421f79ffc302419136cf4e207f768257aecb3fd58627850d1fea6a3e73e6650e09f52b2b1493c358afcc36a2119299c928d0209
+  languageName: node
+  linkType: hard
+
 "pretty-bytes@npm:^6.1.1":
   version: 6.1.1
   resolution: "pretty-bytes@npm:6.1.1"
   checksum: 10c0/c7a660b933355f3b4587ad3f001c266a8dd6afd17db9f89ebc50812354bb142df4b9600396ba5999bdb1f9717300387dc311df91895c5f0f2a1780e22495b5f8
+  languageName: node
+  linkType: hard
+
+"pretty-ms@npm:^5.0.0":
+  version: 5.1.0
+  resolution: "pretty-ms@npm:5.1.0"
+  dependencies:
+    parse-ms: "npm:^2.1.0"
+  checksum: 10c0/a0b1be1453c9c379851f5282fed8c93240feb145f21ba4d10d9a90c48a407048ac2e2e1b0fed95e0026f739ba244724203d0a5242bdd41f1c88b0f1c3cffd1c5
   languageName: node
   linkType: hard
 
@@ -9593,7 +9648,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"readable-stream@npm:^3.6.0":
+"readable-stream@npm:^3.0.0, readable-stream@npm:^3.6.0":
   version: 3.6.2
   resolution: "readable-stream@npm:3.6.2"
   dependencies:
@@ -10329,6 +10384,15 @@ __metadata:
   version: 14.0.1
   resolution: "speakingurl@npm:14.0.1"
   checksum: 10c0/1de1d1b938a7c4d9e79593ff7a26d312ec04a7c3234ca40b7f9b8106daf74ea9d2110a077f5db97ecf3762b83069e3ccbf9694431b51d4fcfd863f0b3333c342
+  languageName: node
+  linkType: hard
+
+"split2@npm:^3.0.0":
+  version: 3.2.2
+  resolution: "split2@npm:3.2.2"
+  dependencies:
+    readable-stream: "npm:^3.0.0"
+  checksum: 10c0/2dad5603c52b353939befa3e2f108f6e3aff42b204ad0f5f16dd12fd7c2beab48d117184ce6f7c8854f9ee5ffec6faae70d243711dd7d143a9f635b4a285de4e
   languageName: node
   linkType: hard
 
@@ -11983,12 +12047,5 @@ __metadata:
     compress-commons: "npm:^6.0.2"
     readable-stream: "npm:^4.0.0"
   checksum: 10c0/50f2fb30327fb9d09879abf7ae2493705313adf403e794b030151aaae00009162419d60d0519e807673ec04d442e140c8879ca14314df0a0192de3b233e8f28b
-  languageName: node
-  linkType: hard
-
-"zod@npm:^3.23.8":
-  version: 3.23.8
-  resolution: "zod@npm:3.23.8"
-  checksum: 10c0/8f14c87d6b1b53c944c25ce7a28616896319d95bc46a9660fe441adc0ed0a81253b02b5abdaeffedbeb23bdd25a0bf1c29d2c12dd919aef6447652dd295e3e69
   languageName: node
   linkType: hard

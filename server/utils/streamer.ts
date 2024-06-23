@@ -11,6 +11,8 @@ export class Streamer {
   #cancel?: AbortController
   #reader?: ReadableStreamDefaultReader<Uint8Array>
 
+  #retry = 0
+
   constructor (url: string, options: StreamerOptions) {
     this.options = options
     this.#url    = url
@@ -43,6 +45,7 @@ export class Streamer {
     fetch(this.#url, { signal: this.#cancel.signal })
       .then((response) => {
         if (response.ok && response.body) {
+          this.#retry  = 0
           this.#reader = response.body.getReader()
 
           this.options.onConnected?.()
@@ -51,8 +54,12 @@ export class Streamer {
         }
       })
       .catch((error: Error) => {
-        if (error.name !== 'AbortError')
+        if (error.name !== 'AbortError') {
           console.error(error)
+
+          if (this.#retry < 3)
+            setTimeout(this.start, 1000 * ++this.#retry)
+        }
       })
   }
 
