@@ -137,16 +137,21 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
       }
     }
 
-    const channel = channels.get(channelNum) ?? startChannel(channelNum)
-    const stream  = new ReadableStream<Buffer>({
+    const stream = new ReadableStream<Buffer>({
       start (controller) {
+        const channel = channels.get(channelNum) ?? startChannel(channelNum)
+
         channel.clients.set(event, { isStart: false, controller })
       },
       cancel () {
-        channel.clients.delete(event)
+        const channel = channels.get(channelNum)
 
-        if (channel.clients.size === 0)
-          stopChannel(channelNum)
+        if (channel) {
+          channel.clients.delete(event)
+
+          if (channel.clients.size === 0)
+            stopChannel(channelNum)
+        }
       },
     })
 
