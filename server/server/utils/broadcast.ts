@@ -49,7 +49,7 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
     const sender  = new Writable({
       write (chunk: Buffer, encoding, next) {
         for (const client of clients.values()) {
-          if (client.isStart)
+          if (client.isStart || clients.size === 1)
             client.controller.enqueue(chunk)
           else {
             const i = chunk.findIndex((c, i) => {
@@ -124,10 +124,9 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
   }
 
   async function sendBroadcast (event: H3Event, channelNum = 0) {
-    setResponseHeader(event, 'Content-Type', 'video/x-msvideo')
+    setResponseHeader(event, 'Content-Type', 'application/octet-stream')
     setResponseHeader(event, 'Cache-Control', 'no-cache')
     setResponseHeader(event, 'Transfer-Encoding', 'chunked')
-    setResponseHeader(event, 'Keep-Alive', 'timeout=5, max=1')
 
     if (!servers[channelNum]) {
       setResponseStatus(event, 404)
