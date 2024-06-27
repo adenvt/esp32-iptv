@@ -150,7 +150,7 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
       channel.clients.set(event, { isStart: false, response: event.node.res })
 
       channel.decoder.once('error', (error: Error) => {
-        if (!isFFMpegCancel(event))
+        if (!isFFMpegCancel(error))
           console.error(error)
 
         reject(error)
