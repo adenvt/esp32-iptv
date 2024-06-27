@@ -13,7 +13,7 @@ export class Audio {
   #smoother: number
 
   #starttTime: number
-  #queue: Queue<{
+  queue: Queue<{
     data: Uint8Array,
     start: number,
     end: number,
@@ -25,7 +25,7 @@ export class Audio {
     this.#gainNode   = this.#ctx.createGain()
     this.#starttTime = this.#ctx.currentTime
     this.#smoother   = 25
-    this.#queue      = new Queue()
+    this.queue       = new Queue(12)
 
     this.#gainNode.gain.value = 1
     this.#gainNode.connect(this.#ctx.destination)
@@ -59,13 +59,13 @@ export class Audio {
   }
 
   feed (data: Uint8Array, start: number, end: number) {
-    this.#queue.add({
+    this.queue.add({
       data, start, end,
     })
   }
 
   loop () {
-    const sample = this.#queue.current
+    const sample = this.queue.current
 
     if (sample) {
       if (milis() < sample.start)
@@ -74,7 +74,7 @@ export class Audio {
       if (milis() < sample.end)
         this.#draw(sample.data)
 
-      this.#queue.next()
+      this.queue.next()
     }
   }
 
@@ -83,7 +83,7 @@ export class Audio {
 
     void this.#ctx.resume()
 
-    this.#queue.clear()
+    this.queue.clear()
   }
 
   stop () {

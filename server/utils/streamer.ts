@@ -1,6 +1,5 @@
 export interface StreamerOptions {
   onConnected?: () => void,
-  onChunk: (chunk: Uint8Array) => void,
   onDisconnected?: () => void,
 }
 
@@ -18,25 +17,12 @@ export class Streamer {
     this.#url    = url
   }
 
-  #loop () {
-    if (this.#reader) {
-      this.#reader.read()
-        .then(({ done, value }) => {
-          if (value)
-            this.options.onChunk(value)
-
-          if (!done)
-            this.#loop()
-        })
-        .catch((error: Error) => {
-          if (error.name !== 'AbortError')
-            console.error(error)
-        })
-    }
-  }
-
   setUrl (url: string) {
     this.#url = url
+  }
+
+  getReader () {
+    return this.#reader
   }
 
   start () {
@@ -49,8 +35,6 @@ export class Streamer {
           this.#reader = response.body.getReader()
 
           this.options.onConnected?.()
-
-          this.#loop()
         }
       })
       .catch((error: Error) => {

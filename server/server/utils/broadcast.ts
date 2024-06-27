@@ -55,23 +55,25 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
     const sender  = new Writable({
       write (chunk: Buffer, encoding, next) {
         for (const client of clients.values()) {
-          if (client.isStart || clients.size === 1)
-            client.response.write(chunk)
-          else {
-            const i = chunk.findIndex((c, i) => {
-              if (i > chunk.length - 5)
-                return false
+          if (!client.response.closed) {
+            if (client.isStart || clients.size === 1)
+              client.response.write(chunk)
+            else {
+              const i = chunk.findIndex((c, i) => {
+                if (i > chunk.length - 5)
+                  return false
 
-              return chunk.subarray(i, i + 4)
-                .toString()
-                .endsWith('dc')
-            })
+                return chunk.subarray(i, i + 4)
+                  .toString()
+                  .endsWith('dc')
+              })
 
-            if (i > -1) {
-              client.response.write(AVI_HEADER)
-              client.response.write(chunk.subarray(i))
+              if (i > -1) {
+                client.response.write(AVI_HEADER)
+                client.response.write(chunk.subarray(i))
 
-              client.isStart = true
+                client.isStart = true
+              }
             }
           }
         }
@@ -117,10 +119,10 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
     const channel = channels.get(channelNum)
 
     if (channel) {
-      channel.decoder.kill('SIGKILL')
+      channel.decoder.kill('SIGINT')
 
       if (typeof channel.source !== 'string')
-        channel.source.kill('SIGKILL')
+        channel.source.kill('SIGINT')
 
       channel.sender.end()
 
@@ -140,9 +142,11 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
   function sendBroadcast (event: H3Event, channelNum = 0) {
     validateBroadcast(event, channelNum)
 
-    setResponseHeader(event, 'Content-Type', 'application/octet-stream')
+    setResponseHeader(event, 'Connection', 'keep-alive')
+    setResponseHeader(event, 'Content-Type', 'video/x-msvideo')
     setResponseHeader(event, 'Cache-Control', 'no-cache')
     setResponseHeader(event, 'Transfer-Encoding', 'chunked')
+    setResponseHeader(event, 'Keep-Alive', 'timeout=15, max=1')
 
     return new Promise<void>((resolve, reject) => {
       const channel = channels.get(channelNum) ?? startChannel(channelNum)
@@ -164,6 +168,8 @@ export function createBroadcaster (servers: BroadcastChannelMeta[], frameRate: n
 
         resolve()
       })
+
+      event.node.res.flushHeaders()
     })
   }
 

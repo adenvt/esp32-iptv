@@ -12,7 +12,7 @@ export class Video {
   #ctx: CanvasRenderingContext2D
   #image: HTMLImageElement
 
-  #queue: Queue<{
+  queue: Queue<{
     data: Uint8Array,
     start: number,
     end: number,
@@ -22,7 +22,7 @@ export class Video {
     this.options = options
     this.#ctx    = options.canvas.getContext('2d')!
     this.#image  = new Image(this.#ctx.canvas.width, this.#ctx.canvas.height)
-    this.#queue  = new Queue()
+    this.queue   = new Queue(3)
 
     this.#image.addEventListener('load', this.#onLoadImage.bind(this), { passive: true })
 
@@ -42,13 +42,13 @@ export class Video {
   }
 
   feed (data: Uint8Array, start: number, end: number) {
-    this.#queue.add({
+    this.queue.add({
       data, start, end,
     })
   }
 
   loop () {
-    const frame = this.#queue.current
+    const frame = this.queue.current
 
     if (frame) {
       if (milis() < frame.start)
@@ -57,12 +57,12 @@ export class Video {
       if (milis() < frame.end)
         this.#draw(frame.data)
 
-      this.#queue.next()
+      this.queue.next()
     }
   }
 
   start () {
-    this.#queue.clear()
+    this.queue.clear()
   }
 
   stop () {

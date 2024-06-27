@@ -7,8 +7,13 @@ export class Queue<T> {
   #head?: QueueItem<T>
   #tail?: QueueItem<T>
 
-  count: number = 0
-  capacity: number = 5
+  count: number
+  capacity: number
+
+  constructor (capacity = 5) {
+    this.capacity = capacity
+    this.count    = 0
+  }
 
   get current () {
     return this.#head?.value
@@ -42,7 +47,7 @@ export class Queue<T> {
     this.count = 0
   }
 
-  isFull () {
+  get isFull () {
     return this.count >= this.capacity
   }
 }
